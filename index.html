@@ -1,82 +1,171 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Simple File Share</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 300px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-
-        input[type="file"] {
-            margin-bottom: 15px;
-        }
-
-        button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .file-list {
-            margin-top: 20px;
-            font-size: 14px;
-            text-align: left;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClassSpace</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CS</div>
+      <div>
+        <div class="title">ClassSpace</div>
+        <div class="subtitle">Hausaufgaben teilen – schnell, simpel, für die ganze Klasse</div>
+      </div>
+    </div>
 
-<div class="container">
-    <h1>Datei teilen</h1>
-    <input type="file" id="fileInput">
-    <br>
-    <button onclick="addFile()">Hinzufügen</button>
+    <div class="top-actions">
+      <div id="userPill" class="pill pill-muted">Öffentlicher Modus</div>
+      <button id="btnOpenAuth" class="btn btn-ghost">Login / Upload</button>
+      <button id="btnLogout" class="btn btn-ghost" style="display:none;">Logout</button>
+    </div>
+  </header>
 
-    <div class="file-list" id="fileList"></div>
-</div>
+  <main class="container">
+    <!-- Auth Drawer -->
+    <section id="authPanel" class="panel" style="display:none;">
+      <div class="panel-head">
+        <div>
+          <h2>Login</h2>
+          <p class="muted">Nur eingeloggte Nutzer können hochladen oder ihre eigenen Dateien löschen.</p>
+        </div>
+        <button id="btnCloseAuth" class="btn btn-ghost">Schließen</button>
+      </div>
 
-<script>
-    function addFile() {
-        const input = document.getElementById('fileInput');
-        const list = document.getElementById('fileList');
+      <div class="grid-2">
+        <div class="card">
+          <h3>Anmelden</h3>
+          <label class="label">Email</label>
+          <input id="loginEmail" class="input" type="email" placeholder="name@schule.de" />
+          <label class="label">Passwort</label>
+          <input id="loginPw" class="input" type="password" placeholder="••••••••" />
+          <button id="btnLogin" class="btn btn-primary">Login</button>
+          <div id="loginMsg" class="msg"></div>
+        </div>
 
-        if (input.files.length > 0) {
-            const fileName = input.files[0].name;
-            const entry = document.createElement('div');
-            entry.textContent = "• " + fileName;
-            list.appendChild(entry);
-        }
-    }
-</script>
+        <div class="card">
+          <h3>Registrieren</h3>
+          <p class="muted small">
+            Optional, aber praktisch: Nur mit Account kannst du Dateien hochladen/löschen.
+          </p>
+          <label class="label">Email</label>
+          <input id="signupEmail" class="input" type="email" placeholder="name@schule.de" />
+          <label class="label">Passwort</label>
+          <input id="signupPw" class="input" type="password" placeholder="mind. 6 Zeichen" />
+          <button id="btnSignup" class="btn btn-secondary">Account erstellen</button>
+          <div id="signupMsg" class="msg"></div>
+        </div>
+      </div>
+    </section>
 
+    <!-- Upload (nur eingeloggte) -->
+    <section id="uploadPanel" class="panel" style="display:none;">
+      <div class="panel-head">
+        <div>
+          <h2>Upload</h2>
+          <p class="muted">Wähle Fach + Tags, lade Datei hoch – fertig.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="grid-3">
+          <div>
+            <label class="label">Fach</label>
+            <select id="subjectSelect" class="input">
+              <option value="">Bitte wählen…</option>
+              <option>Mathe</option>
+              <option>Deutsch</option>
+              <option>Englisch</option>
+              <option>Französisch</option>
+              <option>Latein</option>
+              <option>Physik</option>
+              <option>Chemie</option>
+              <option>Biologie</option>
+              <option>Informatik</option>
+              <option>Geschichte</option>
+              <option>Geographie</option>
+              <option>Politik</option>
+              <option>Kunst</option>
+              <option>Musik</option>
+              <option>Sport</option>
+              <option>Sonstiges</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label">Tags (kommagetrennt)</label>
+            <input id="tagsInput" class="input" placeholder="z.B. Vektoren, LK, Klausur" />
+            <div class="muted small">Tipp: kurze, klare Tags helfen beim Filtern.</div>
+          </div>
+
+          <div>
+            <label class="label">Datei</label>
+            <input id="fileInput" class="input" type="file" />
+          </div>
+        </div>
+
+        <div class="row gap">
+          <button id="btnUpload" class="btn btn-primary">Hochladen</button>
+          <div id="uploadMsg" class="msg"></div>
+        </div>
+
+        <div id="progressWrap" class="progress-wrap" style="display:none;">
+          <div class="progress-bar">
+            <div id="progressBarFill" class="progress-fill"></div>
+          </div>
+          <div id="progressText" class="muted small">Uploading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Browser (öffentlich) -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Dateien</h2>
+          <p class="muted">Öffentlich sichtbar. Filtern nach Fach/Tag.</p>
+        </div>
+
+        <div class="filters">
+          <select id="filterSubject" class="input input-compact">
+            <option value="__all__">Alle Fächer</option>
+            <option>Mathe</option><option>Deutsch</option><option>Englisch</option>
+            <option>Französisch</option><option>Latein</option><option>Physik</option>
+            <option>Chemie</option><option>Biologie</option><option>Informatik</option>
+            <option>Geschichte</option><option>Geographie</option><option>Politik</option>
+            <option>Kunst</option><option>Musik</option><option>Sport</option>
+            <option>Sonstiges</option>
+          </select>
+
+          <select id="filterTag" class="input input-compact">
+            <option value="__all__">Alle Tags</option>
+          </select>
+
+          <button id="btnRefresh" class="btn btn-ghost">Aktualisieren</button>
+        </div>
+      </div>
+
+      <div id="listMeta" class="muted small">Lade…</div>
+      <div id="filesGrid" class="files-grid"></div>
+
+      <div id="emptyState" class="empty" style="display:none;">
+        <div class="empty-title">Keine Dateien gefunden</div>
+        <div class="muted">Versuch andere Filter oder lade selbst etwas hoch.</div>
+      </div>
+    </section>
+
+    <footer class="footer muted small">
+      <span>ClassSpace · GitHub Pages + Firebase</span>
+      <span>·</span>
+      <span id="footerStatus">Status: bereit</span>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" style="display:none;"></div>
+
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
